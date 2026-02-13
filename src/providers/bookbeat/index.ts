@@ -69,7 +69,7 @@ export default class BookBeatProvider extends BaseProvider {
       if (suggestRes.status !== 200) throw new Error('BookBeat suggest API error')
       const suggestJson = suggestRes.data
       suggestions = (suggestJson.suggestions || []).filter((s: any) => s.id && s.id.includes('BookTitle'))
-      if (!skipCache) dbManager.setSearchCache(this.config.id, title, author, suggestUrl, JSON.stringify(suggestions))
+      dbManager.setSearchCache(this.config.id, title, author, suggestUrl, JSON.stringify(suggestions))
     }
 
     const books: BookMetadata[] = []
@@ -89,7 +89,7 @@ export default class BookBeatProvider extends BaseProvider {
         if (bookRes.status !== 200) continue
         const bookJson = bookRes.data
         bookData = bookJson._embedded?.books?.[0]
-        if (!skipCache) dbManager.setBookCache(this.config.id, bookUrl, JSON.stringify(bookJson))
+        dbManager.setBookCache(this.config.id, bookUrl, JSON.stringify(bookJson))
       }
       if (bookData) {
         books.push(this.mapBookBeatToMetadata(bookData))

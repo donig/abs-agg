@@ -98,7 +98,7 @@ export default class BigFinishProvider extends BaseProvider {
         searchResults = searchRes.data as Record<string, BigFinishSearchResult>
       }
 
-      if (!skipCache && Object.keys(searchResults).length > 0) {
+      if (Object.keys(searchResults).length > 0) {
         dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchResults))
       }
     }
@@ -132,7 +132,7 @@ export default class BigFinishProvider extends BaseProvider {
           const html = typeof pageRes.data === 'string' ? pageRes.data : String(pageRes.data)
           bookData = this.parseProductPage(productUrl, html)
 
-          if (bookData && !skipCache) {
+          if (bookData) {
             dbManager.setBookCache(this.config.id, productUrl, JSON.stringify(bookData))
           }
         }

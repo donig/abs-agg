@@ -38,10 +38,7 @@ export async function searchHandler(req: Request, res: Response): Promise<void> 
 
   try {
     const matches = await provider.search(title, authorStr, parsedParams, { skipCache })
-
-    if (!skipCache) {
-      dbManager.setSearchCache(config.id, title, authorStr, paramsHash, JSON.stringify(matches))
-    }
+    dbManager.setSearchCache(config.id, title, authorStr, paramsHash, JSON.stringify(matches))
 
     res.json({ matches })
   } catch (error) {

@@ -118,7 +118,7 @@ export default class StorytelProvider extends BaseProvider {
       if (searchRes.status !== 200) throw new Error('Storytel search API error')
       const searchJson = searchRes.data as StorytelSearchResponse
       searchResults = searchJson.books || []
-      if (!skipCache) dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
+      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
     }
 
     const books: BookMetadata[] = []

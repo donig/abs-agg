@@ -126,7 +126,7 @@ export default class LibrivoxProvider extends BaseProvider {
     const data = response.data
     const books = data.books || []
 
-    if (!skipCache && books.length > 0) {
+    if (books.length > 0) {
       dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(books))
     }
 

@@ -44,7 +44,7 @@ export default class ThaliaProvider extends BaseProvider {
       if (searchRes.status !== 200) throw new Error('Thalia search API error')
       const searchJson = searchRes.data as ThaliaResponse
       searchResults = searchJson.artikelliste || []
-      if (!skipCache) dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
+      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
     }
 
     const audiobookFilter: string[] = ['Hörbuch', 'Hörspiel', 'Audiobook']

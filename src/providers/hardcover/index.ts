@@ -84,7 +84,7 @@ export default class HardcoverProvider extends BaseProvider {
     const rawIds = searchResponse.data?.data?.search?.ids || []
     const bookIds = rawIds.map((id) => (typeof id === 'string' ? parseInt(id, 10) : id))
 
-    if (!skipCache && bookIds.length > 0) {
+    if (bookIds.length > 0) {
       dbManager.setSearchCache(this.config.id, title, author, cacheKey, JSON.stringify(bookIds))
     }
 
@@ -118,7 +118,7 @@ export default class HardcoverProvider extends BaseProvider {
 
     const books = detailsResponse.data?.data?.books || []
 
-    if (!skipCache && books.length > 0) {
+    if (books.length > 0) {
       dbManager.setBookCache(this.config.id, detailsCacheKey, JSON.stringify(books))
     }
 

@@ -65,7 +65,7 @@ export default class AudiotekaProvider extends BaseProvider {
       const $ = cheerio.load(searchRes.data as string)
       searchMatches = parseSearchResults($)
 
-      if (!skipCache && searchMatches.length > 0) {
+      if (searchMatches.length > 0) {
         dbManager.setSearchCache(this.config.id, title, author, cacheKey, JSON.stringify(searchMatches))
       }
     }
@@ -127,9 +127,7 @@ export default class AudiotekaProvider extends BaseProvider {
     const $ = cheerio.load(response.data as string)
     const fullMetadata = parseBookDetails($, match, langConfig)
 
-    if (!skipCache) {
-      dbManager.setSearchCache(this.config.id, match.id, null, cacheKey, JSON.stringify(fullMetadata))
-    }
+    dbManager.setSearchCache(this.config.id, match.id, null, cacheKey, JSON.stringify(fullMetadata))
 
     return fullMetadata
   }

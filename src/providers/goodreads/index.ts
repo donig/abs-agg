@@ -126,7 +126,7 @@ export default class GoodreadsProvider extends BaseProvider {
     const bookIds = sortedResults.slice(0, limit).map((r) => r.id)
     const books = await this.fetchBookDetails(bookIds, skipCache)
 
-    if (!skipCache && books.length > 0) {
+    if (books.length > 0) {
       dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(books))
     }
 
@@ -230,9 +230,7 @@ export default class GoodreadsProvider extends BaseProvider {
 
       if (metadata) {
         books.push(metadata)
-        if (!skipCache) {
-          dbManager.setBookCache(this.config.id, bookId, JSON.stringify(metadata))
-        }
+        dbManager.setBookCache(this.config.id, bookId, JSON.stringify(metadata))
       }
     }
 

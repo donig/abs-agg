@@ -67,9 +67,7 @@ export default class ArdAudiothekProvider extends BaseProvider {
       }
       searchJson = searchRes.data as ArdSearchResponse
 
-      if (!skipCache) {
-        dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-      }
+      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
     }
 
     return this.mapGeneralSearchResults(searchJson, limit)
@@ -196,9 +194,7 @@ export default class ArdAudiothekProvider extends BaseProvider {
       const searchJson = searchRes.data as ArdProgramSetSearchResponse
       searchResults = searchJson.data?.search?.programSets?.nodes || []
 
-      if (!skipCache) {
-        dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-      }
+      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
     }
 
     const books: BookMetadata[] = []
