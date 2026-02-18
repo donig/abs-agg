@@ -103,16 +103,6 @@ export default class LibrivoxProvider extends BaseProvider {
 
     const searchUrl = `${this.baseUrl}?${searchParams.toString()}`
 
-    if (!skipCache) {
-      const cachedResult = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (cachedResult) {
-        try {
-          const cached = JSON.parse(cachedResult) as LibrivoxBook[]
-          return cached.map((book) => this.mapLibrivoxToMetadata(book))
-        } catch {}
-      }
-    }
-
     const response = await httpClient.get<LibrivoxApiResponse>(searchUrl)
 
     if (response.status === 404) {
@@ -125,10 +115,6 @@ export default class LibrivoxProvider extends BaseProvider {
 
     const data = response.data
     const books = data.books || []
-
-    if (!skipCache && books.length > 0) {
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(books))
-    }
 
     return books.map((book) => this.mapLibrivoxToMetadata(book))
   }

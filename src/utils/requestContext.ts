@@ -16,7 +16,7 @@ export function runWithContext<T>(ctx: ReqContext, fn: () => T): T {
 }
 
 export function attachRequestContext(req: Request, _res: Response, next: NextFunction): void {
-  const skip = req.query.cache === 'false'
+  const skip = req.query.cache === 'false' || process.env.DISABLE_CACHE === 'true'
   asyncLocalStorage.run({ skipCache: skip }, () => next())
 }
 

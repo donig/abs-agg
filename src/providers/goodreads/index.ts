@@ -88,16 +88,6 @@ export default class GoodreadsProvider extends BaseProvider {
 
     const searchUrl = `${GOODREADS_API_URL}/search/index.xml?key=${this.apiKey}&q=${encodeURIComponent(title)}&search[field]=title`
 
-    if (!skipCache) {
-      const cachedResult = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (cachedResult) {
-        try {
-          const cached = JSON.parse(cachedResult) as BookMetadata[]
-          return cached.slice(0, limit)
-        } catch {}
-      }
-    }
-
     const response = await httpClient.get(searchUrl, {
       headers: { Accept: 'application/xml' },
       responseType: 'text'
@@ -125,10 +115,6 @@ export default class GoodreadsProvider extends BaseProvider {
 
     const bookIds = sortedResults.slice(0, limit).map((r) => r.id)
     const books = await this.fetchBookDetails(bookIds, skipCache)
-
-    if (!skipCache && books.length > 0) {
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(books))
-    }
 
     return books
   }
@@ -230,9 +216,7 @@ export default class GoodreadsProvider extends BaseProvider {
 
       if (metadata) {
         books.push(metadata)
-        if (!skipCache) {
-          dbManager.setBookCache(this.config.id, bookId, JSON.stringify(metadata))
-        }
+        dbManager.setBookCache(this.config.id, bookId, JSON.stringify(metadata))
       }
     }
 

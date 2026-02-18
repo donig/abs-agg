@@ -47,12 +47,16 @@ export class DatabaseManager {
   }
 
   public getSearchCache(providerId: string, title: string, author: string | null, paramsHash: string): string | null {
-    if (getSkipCacheFlag()) return null
+    if (getSkipCacheFlag()) {
+      console.log(`[cache] search read SKIPPED for ${providerId} "${title}"`)
+      return null
+    }
     const stmt = this.db.prepare(`
-      SELECT response FROM search_cache 
+      SELECT response FROM search_cache
       WHERE provider_id = ? AND title = ? AND author IS ? AND params_hash = ?
     `)
     const row = stmt.get(providerId, title, author, paramsHash) as { response: string } | undefined
+    console.log(`[cache] search read ${row ? 'HIT' : 'MISS'} for ${providerId} "${title}"`)
     return row?.response ?? null
   }
 
@@ -68,15 +72,20 @@ export class DatabaseManager {
       VALUES (?, ?, ?, ?, ?, ?)
     `)
     stmt.run(providerId, title, author, paramsHash, response, Date.now())
+    console.log(`[cache] search write for ${providerId} "${title}"`)
   }
 
   public getBookCache(providerId: string, bookId: string): string | null {
-    if (getSkipCacheFlag()) return null
+    if (getSkipCacheFlag()) {
+      console.log(`[cache] book read SKIPPED for ${providerId} "${bookId}"`)
+      return null
+    }
     const stmt = this.db.prepare(`
-      SELECT metadata FROM book_cache 
+      SELECT metadata FROM book_cache
       WHERE provider_id = ? AND book_id = ?
     `)
     const row = stmt.get(providerId, bookId) as { metadata: string } | undefined
+    console.log(`[cache] book read ${row ? 'HIT' : 'MISS'} for ${providerId} "${bookId}"`)
     return row?.metadata ?? null
   }
 
@@ -86,6 +95,7 @@ export class DatabaseManager {
       VALUES (?, ?, ?, ?)
     `)
     stmt.run(providerId, bookId, metadata, Date.now())
+    console.log(`[cache] book write for ${providerId} "${bookId}"`)
   }
 
   public clearCache(providerId?: string): void {

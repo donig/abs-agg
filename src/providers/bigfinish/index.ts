@@ -74,33 +74,17 @@ export default class BigFinishProvider extends BaseProvider {
     const query = title.replace(/:/g, ' ')
     const searchUrl = `${SEARCH_URL}/${encodeURIComponent(query)}`
 
-    let searchResults: Record<string, BigFinishSearchResult> = {}
+    const searchRes = await httpClient.get(searchUrl, {
+      headers: { ...BROWSER_HEADERS, Accept: 'application/json' }
+    })
 
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (searchCache) {
-        try {
-          searchResults = JSON.parse(searchCache)
-        } catch {}
-      }
+    if (searchRes.status !== 200) {
+      throw new Error(`Big Finish search API error: ${searchRes.status}`)
     }
 
-    if (Object.keys(searchResults).length === 0) {
-      const searchRes = await httpClient.get(searchUrl, {
-        headers: { ...BROWSER_HEADERS, Accept: 'application/json' }
-      })
-
-      if (searchRes.status !== 200) {
-        throw new Error(`Big Finish search API error: ${searchRes.status}`)
-      }
-
-      if (typeof searchRes.data === 'object' && searchRes.data !== null) {
-        searchResults = searchRes.data as Record<string, BigFinishSearchResult>
-      }
-
-      if (!skipCache && Object.keys(searchResults).length > 0) {
-        dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchResults))
-      }
+    let searchResults: Record<string, BigFinishSearchResult> = {}
+    if (typeof searchRes.data === 'object' && searchRes.data !== null) {
+      searchResults = searchRes.data as Record<string, BigFinishSearchResult>
     }
 
     const books: BookMetadata[] = []
@@ -132,7 +116,7 @@ export default class BigFinishProvider extends BaseProvider {
           const html = typeof pageRes.data === 'string' ? pageRes.data : String(pageRes.data)
           bookData = this.parseProductPage(productUrl, html)
 
-          if (bookData && !skipCache) {
+          if (bookData) {
             dbManager.setBookCache(this.config.id, productUrl, JSON.stringify(bookData))
           }
         }
