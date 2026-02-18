@@ -14,6 +14,7 @@ export interface BookMetadata {
   cover?: string
   isbn?: string
   asin?: string
+  bookId?: string
   genres?: string[]
   tags?: string[]
   series?: SeriesMetadata[]
