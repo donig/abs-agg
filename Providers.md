@@ -1,6 +1,6 @@
 # Metadata Providers
 
-Total Providers: 9
+Total Providers: 10
 
 ## Table of Contents
 
@@ -12,6 +12,7 @@ Total Providers: 9
 - [Graphic Audio](#graphicaudio)
 - [Hardcover](#hardcover)
 - [LibriVox](#librivox)
+- [Soundbooth Theater](#soundbooththeater)
 - [Storytel](#storytel)
 
 ---
@@ -437,6 +438,53 @@ Under "Auth" use `abs`
 ### Comments
 
 - Use ^ prefix in title/author to anchor search to beginning of term
+
+---
+
+## Soundbooth Theater
+
+**ID:** `soundbooththeater`
+
+**Description:** Soundbooth Theater
+
+**Metadata-URL:** [https://soundbooththeater.com](https://soundbooththeater.com)
+
+### Parameters
+
+No parameters required.
+
+### Returned Fields
+
+- `title`
+- `series`
+- `cover`
+- `author`
+- `narrator`
+- `description`
+- `duration`
+- `publishedYear`
+- `genres`
+- `subtitle`
+
+### Example Request
+
+```
+GET /soundbooththeater/search?title=example&author=author
+```
+
+### Add to Audiobookshelf
+
+```
+https://provider.vito0912.de/soundbooththeater
+```
+
+Under "Auth" use `abs`
+
+> The URL can be replaced by your own deployment. The hosted provider can break at any moment.
+
+### Comments
+
+- The implementation of this provider is highly experimental and may not work reliably.
 
 ---
 
