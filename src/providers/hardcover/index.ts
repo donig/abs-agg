@@ -55,15 +55,6 @@ export default class HardcoverProvider extends BaseProvider {
     const searchQuery = author ? `${title} ${author}` : title
     const cacheKey = `hardcover:${searchQuery}:${limit}`
 
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, cacheKey)
-      if (searchCache) {
-        try {
-          return JSON.parse(searchCache) as number[]
-        } catch {}
-      }
-    }
-
     const searchResponse = await axios.post<{ data?: HardcoverSearchResponse }>(
       HARDCOVER_API_URL,
       {
@@ -84,24 +75,11 @@ export default class HardcoverProvider extends BaseProvider {
     const rawIds = searchResponse.data?.data?.search?.ids || []
     const bookIds = rawIds.map((id) => (typeof id === 'string' ? parseInt(id, 10) : id))
 
-    if (bookIds.length > 0) {
-      dbManager.setSearchCache(this.config.id, title, author, cacheKey, JSON.stringify(bookIds))
-    }
-
     return bookIds
   }
 
   private async fetchBookDetails(bookIds: number[], skipCache: boolean): Promise<HardcoverBook[]> {
     const detailsCacheKey = `details:${bookIds.join(',')}`
-
-    if (!skipCache) {
-      const detailsCache = dbManager.getBookCache(this.config.id, detailsCacheKey)
-      if (detailsCache) {
-        try {
-          return JSON.parse(detailsCache) as HardcoverBook[]
-        } catch {}
-      }
-    }
 
     const detailsResponse = await axios.post<{ data?: HardcoverBooksResponse }>(
       HARDCOVER_API_URL,
@@ -117,10 +95,6 @@ export default class HardcoverProvider extends BaseProvider {
     }
 
     const books = detailsResponse.data?.data?.books || []
-
-    if (books.length > 0) {
-      dbManager.setBookCache(this.config.id, detailsCacheKey, JSON.stringify(books))
-    }
 
     return books
   }

@@ -55,22 +55,10 @@ export default class BookBeatProvider extends BaseProvider {
     const skipCache = options?.skipCache === true
 
     let suggestions: BookBeatSuggest[] = []
-    if (!skipCache) {
-      const suggestCache = dbManager.getSearchCache(this.config.id, title, author, suggestUrl)
-      if (suggestCache) {
-        try {
-          suggestions = JSON.parse(suggestCache)
-        } catch {}
-      }
-    }
-
-    if (suggestions.length === 0) {
-      const suggestRes = await httpClient.get(suggestUrl)
-      if (suggestRes.status !== 200) throw new Error('BookBeat suggest API error')
-      const suggestJson = suggestRes.data
-      suggestions = (suggestJson.suggestions || []).filter((s: any) => s.id && s.id.includes('BookTitle'))
-      dbManager.setSearchCache(this.config.id, title, author, suggestUrl, JSON.stringify(suggestions))
-    }
+    const suggestRes = await httpClient.get(suggestUrl)
+    if (suggestRes.status !== 200) throw new Error('BookBeat suggest API error')
+    const suggestJson = suggestRes.data
+    suggestions = (suggestJson.suggestions || []).filter((s: any) => s.id && s.id.includes('BookTitle'))
 
     const books: BookMetadata[] = []
     for (const suggestion of suggestions.slice(0, 3)) {
@@ -99,7 +87,6 @@ export default class BookBeatProvider extends BaseProvider {
   }
 
   private mapBookBeatToMetadata(book: BookBeatBook): BookMetadata {
-    console.log(book)
     return normalizeBookMetadata({
       title: book.title,
       author: book.author || book._embedded?.contributors?.find((c) => c.role === 'bb-author')?.displayname,

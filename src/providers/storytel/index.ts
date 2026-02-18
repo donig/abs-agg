@@ -102,24 +102,10 @@ export default class StorytelProvider extends BaseProvider {
 
     const searchUrl = `https://www.storytel.com/api/search.action?request_locale=${encodeURIComponent(language)}&q=${encodeURIComponent(title.replace(/\s+/g, '+'))}`
 
-    let searchResults: StorytelSearchResult[] = []
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (searchCache) {
-        try {
-          const parsed = JSON.parse(searchCache) as StorytelSearchResponse
-          searchResults = parsed.books || []
-        } catch {}
-      }
-    }
-
-    if (searchResults.length === 0) {
-      const searchRes = await httpClient.get(searchUrl)
-      if (searchRes.status !== 200) throw new Error('Storytel search API error')
-      const searchJson = searchRes.data as StorytelSearchResponse
-      searchResults = searchJson.books || []
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-    }
+    const searchRes = await httpClient.get(searchUrl)
+    if (searchRes.status !== 200) throw new Error('Storytel search API error')
+    const searchJson = searchRes.data as StorytelSearchResponse
+    const searchResults = searchJson.books || []
 
     const books: BookMetadata[] = []
     for (const result of searchResults
@@ -131,7 +117,6 @@ export default class StorytelProvider extends BaseProvider {
           : true
       )
       .slice(0, limit)) {
-      console.log(result)
       if (!result.book) continue
 
       const metadata = this.mapStorytelToMetadata(result, params)

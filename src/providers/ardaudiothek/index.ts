@@ -49,26 +49,11 @@ export default class ArdAudiothekProvider extends BaseProvider {
   ): Promise<BookMetadata[]> {
     const searchUrl = `${ARD_API_BASE}/search?query=${encodeURIComponent(title)}&offset=0&limit=${limit}`
 
-    let searchJson: ArdSearchResponse | null = null
-
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (searchCache) {
-        try {
-          searchJson = JSON.parse(searchCache) as ArdSearchResponse
-        } catch {}
-      }
+    const searchRes = await httpClient.get(searchUrl)
+    if (searchRes.status !== 200) {
+      throw new Error(`ARD Audiothek API error: ${searchRes.status}`)
     }
-
-    if (!searchJson) {
-      const searchRes = await httpClient.get(searchUrl)
-      if (searchRes.status !== 200) {
-        throw new Error(`ARD Audiothek API error: ${searchRes.status}`)
-      }
-      searchJson = searchRes.data as ArdSearchResponse
-
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-    }
+    const searchJson = searchRes.data as ArdSearchResponse
 
     return this.mapGeneralSearchResults(searchJson, limit)
   }
@@ -174,28 +159,12 @@ export default class ArdAudiothekProvider extends BaseProvider {
   ): Promise<BookMetadata[]> {
     const searchUrl = `${ARD_API_BASE}/search/programsets?query=${encodeURIComponent(title)}`
 
-    let searchResults: ArdProgramSet[] = []
-
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (searchCache) {
-        try {
-          const parsed = JSON.parse(searchCache) as ArdProgramSetSearchResponse
-          searchResults = parsed.data?.search?.programSets?.nodes || []
-        } catch {}
-      }
+    const searchRes = await httpClient.get(searchUrl)
+    if (searchRes.status !== 200) {
+      throw new Error(`ARD Audiothek API error: ${searchRes.status}`)
     }
-
-    if (searchResults.length === 0) {
-      const searchRes = await httpClient.get(searchUrl)
-      if (searchRes.status !== 200) {
-        throw new Error(`ARD Audiothek API error: ${searchRes.status}`)
-      }
-      const searchJson = searchRes.data as ArdProgramSetSearchResponse
-      searchResults = searchJson.data?.search?.programSets?.nodes || []
-
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-    }
+    const searchJson = searchRes.data as ArdProgramSetSearchResponse
+    const searchResults = searchJson.data?.search?.programSets?.nodes || []
 
     const books: BookMetadata[] = []
 

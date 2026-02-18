@@ -25,27 +25,12 @@ export default class ThaliaProvider extends BaseProvider {
 
     const searchUrl = `https://app.thalia.de/api/rest/suche/v5/?suchbegriff=${encodeURIComponent(title.replace(/\s+/g, '+'))}&gewuenschteSeite=1&artikelServiceAufrufen=true&anzahlArtikelProSeite=${limit}`
 
-    let searchResults: ThaliaSearchResult[] = []
-
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, searchUrl)
-      if (searchCache) {
-        try {
-          const parsed = JSON.parse(searchCache) as ThaliaResponse
-          searchResults = parsed.artikelliste || []
-        } catch {}
-      }
-    }
-
-    if (searchResults.length === 0) {
-      console.log(searchUrl)
-      const searchRes = await httpClient.get(searchUrl)
-      console.log(searchRes.status, searchRes.data)
-      if (searchRes.status !== 200) throw new Error('Thalia search API error')
-      const searchJson = searchRes.data as ThaliaResponse
-      searchResults = searchJson.artikelliste || []
-      dbManager.setSearchCache(this.config.id, title, author, searchUrl, JSON.stringify(searchJson))
-    }
+    console.log(searchUrl)
+    const searchRes = await httpClient.get(searchUrl)
+    console.log(searchRes.status, searchRes.data)
+    if (searchRes.status !== 200) throw new Error('Thalia search API error')
+    const searchJson = searchRes.data as ThaliaResponse
+    const searchResults = searchJson.artikelliste || []
 
     const audiobookFilter: string[] = ['Hörbuch', 'Hörspiel', 'Audiobook']
     const bookFilter: string[] = ['Buch', 'eBook', 'E-Book', 'Taschenbuch', 'Hardcover']

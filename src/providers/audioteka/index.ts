@@ -36,39 +36,23 @@ export default class AudiotekaProvider extends BaseProvider {
     const searchUrl = `${langConfig.searchUrl}?phrase=${encodeURIComponent(title)}`
     const cacheKey = `${searchUrl}_${lang}`
 
-    let searchMatches: AudiotekaSearchMatch[] = []
-
-    if (!skipCache) {
-      const searchCache = dbManager.getSearchCache(this.config.id, title, author, cacheKey)
-      if (searchCache) {
-        try {
-          searchMatches = JSON.parse(searchCache) as AudiotekaSearchMatch[]
-        } catch {}
+    const searchRes = await httpClient.get(searchUrl, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': langConfig.acceptLanguage
       }
+    })
+
+    if (searchRes.status !== 200) {
+      console.warn(`Audioteka search returned status ${searchRes.status} for query: ${title}`)
+      return []
     }
 
-    if (searchMatches.length === 0) {
-      const searchRes = await httpClient.get(searchUrl, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': langConfig.acceptLanguage
-        }
-      })
+    const $ = cheerio.load(searchRes.data as string)
+    const searchMatches = parseSearchResults($)
 
-      if (searchRes.status !== 200) {
-        console.warn(`Audioteka search returned status ${searchRes.status} for query: ${title}`)
-        return []
-      }
-
-      const $ = cheerio.load(searchRes.data as string)
-      searchMatches = parseSearchResults($)
-
-      if (searchMatches.length > 0) {
-        dbManager.setSearchCache(this.config.id, title, author, cacheKey, JSON.stringify(searchMatches))
-      }
-    }
     const books: BookMetadata[] = []
     const limitedMatches = searchMatches.slice(0, limit)
 
@@ -100,16 +84,6 @@ export default class AudiotekaProvider extends BaseProvider {
     skipCache: boolean
   ): Promise<AudiotekaFullMetadata> {
     const langConfig = AUDIOTEKA_LANGUAGES[lang]
-    const cacheKey = `detail_${match.url}`
-
-    if (!skipCache) {
-      const detailCache = dbManager.getSearchCache(this.config.id, match.id, null, cacheKey)
-      if (detailCache) {
-        try {
-          return JSON.parse(detailCache) as AudiotekaFullMetadata
-        } catch {}
-      }
-    }
 
     const response = await httpClient.get(match.url, {
       headers: {
@@ -125,11 +99,7 @@ export default class AudiotekaProvider extends BaseProvider {
     }
 
     const $ = cheerio.load(response.data as string)
-    const fullMetadata = parseBookDetails($, match, langConfig)
-
-    dbManager.setSearchCache(this.config.id, match.id, null, cacheKey, JSON.stringify(fullMetadata))
-
-    return fullMetadata
+    return parseBookDetails($, match, langConfig)
   }
 
   private mapToBookMetadata(data: AudiotekaFullMetadata): BookMetadata {

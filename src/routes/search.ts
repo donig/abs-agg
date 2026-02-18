@@ -21,7 +21,7 @@ export async function searchHandler(req: Request, res: Response): Promise<void> 
   const config = provider.getConfig()
   const paramsHash = createParametersHash(parsedParams)
 
-  const skipCache = req.query.cache === 'false'
+  const skipCache = req.query.cache === 'false' || process.env.SKIP_CACHE === 'true'
 
   if (!skipCache) {
     const cached = dbManager.getSearchCache(config.id, title, authorStr, paramsHash)
