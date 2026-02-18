@@ -3,7 +3,6 @@ import { BookMetadata, ParsedParameters, ProviderConfig } from '../../types'
 import path from 'path'
 import fs from 'fs'
 import { ThaliaResponse, ThaliaSearchResult } from './types'
-import { dbManager } from '../../database/manager'
 import { httpClient } from '../../utils/httpClient'
 
 const configPath = path.join(__dirname, 'config.json')
@@ -16,12 +15,11 @@ export default class ThaliaProvider extends BaseProvider {
 
   async search(
     title: string,
-    author: string | null,
+    _author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
     const limit = Math.min((params.limit as number) || 5, 30)
-    const skipCache = options?.skipCache === true
 
     const searchUrl = `https://app.thalia.de/api/rest/suche/v5/?suchbegriff=${encodeURIComponent(title.replace(/\s+/g, '+'))}&gewuenschteSeite=1&artikelServiceAufrufen=true&anzahlArtikelProSeite=${limit}`
 

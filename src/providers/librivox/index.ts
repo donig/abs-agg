@@ -76,9 +76,8 @@ export default class LibrivoxProvider extends BaseProvider {
     title: string,
     author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
-    const skipCache = options?.skipCache === true
     const genre = params.genre as string | undefined
     const limit = params.limit ? String(params.limit) : '10'
 

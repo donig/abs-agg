@@ -64,7 +64,7 @@ export default class BigFinishProvider extends BaseProvider {
 
   async search(
     title: string,
-    author: string | null,
+    _author: string | null,
     params: ParsedParameters,
     options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {

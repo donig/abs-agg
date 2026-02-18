@@ -1,7 +1,6 @@
 import { BaseProvider } from '../BaseProvider'
 import { BookMetadata, ParsedParameters, ProviderConfig } from '../../types'
 import { normalizeBookMetadata } from '../../utils/helpers'
-import { dbManager } from '../../database/manager'
 import { httpClient } from '../../utils/httpClient'
 import { cleanTitle, extractSubtitle } from './utils'
 import path from 'path'
@@ -92,13 +91,12 @@ export default class StorytelProvider extends BaseProvider {
 
   async search(
     title: string,
-    author: string | null,
+    _author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
     const language = params.language as string
     const limit = Math.min((params.limit as number) || 3, 10)
-    const skipCache = options?.skipCache === true
 
     const searchUrl = `https://www.storytel.com/api/search.action?request_locale=${encodeURIComponent(language)}&q=${encodeURIComponent(title.replace(/\s+/g, '+'))}`
 

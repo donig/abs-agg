@@ -1,7 +1,6 @@
 import { BaseProvider } from '../BaseProvider'
 import { BookMetadata, ParsedParameters, ProviderConfig } from '../../types'
 import { normalizeBookMetadata } from '../../utils/helpers'
-import { dbManager } from '../../database/manager'
 import { httpClient } from '../../utils/httpClient'
 import * as cheerio from 'cheerio'
 import path from 'path'
@@ -20,13 +19,12 @@ export default class AudiotekaProvider extends BaseProvider {
 
   async search(
     title: string,
-    author: string | null,
+    _author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
     const lang = params.lang as string
     const limit = Math.min((params.limit as number) || 5, 20)
-    const skipCache = options?.skipCache === true
 
     const langConfig = AUDIOTEKA_LANGUAGES[lang]
     if (!langConfig) {
@@ -34,7 +32,6 @@ export default class AudiotekaProvider extends BaseProvider {
     }
 
     const searchUrl = `${langConfig.searchUrl}?phrase=${encodeURIComponent(title)}`
-    const cacheKey = `${searchUrl}_${lang}`
 
     const searchRes = await httpClient.get(searchUrl, {
       headers: {
@@ -58,7 +55,7 @@ export default class AudiotekaProvider extends BaseProvider {
 
     for (const match of limitedMatches) {
       try {
-        const fullMetadata = await this.fetchBookDetails(match, lang, skipCache)
+        const fullMetadata = await this.fetchBookDetails(match, lang)
         const metadata = this.mapToBookMetadata(fullMetadata)
         if (metadata.title) {
           books.push(metadata)
@@ -80,8 +77,7 @@ export default class AudiotekaProvider extends BaseProvider {
 
   private async fetchBookDetails(
     match: AudiotekaSearchMatch,
-    lang: string,
-    skipCache: boolean
+    lang: string
   ): Promise<AudiotekaFullMetadata> {
     const langConfig = AUDIOTEKA_LANGUAGES[lang]
 

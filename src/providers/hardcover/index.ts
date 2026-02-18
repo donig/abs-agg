@@ -1,7 +1,6 @@
 import { BaseProvider } from '../BaseProvider'
 import { BookMetadata, ParsedParameters, ProviderConfig } from '../../types'
 import { normalizeBookMetadata } from '../../utils/helpers'
-import { dbManager } from '../../database/manager'
 import { HardcoverBook, HardcoverBooksResponse, HardcoverSearchResponse } from './types'
 import { HARDCOVER_API_URL, SEARCH_QUERY, BOOK_DETAILS_QUERY } from './queries'
 import path from 'path'
@@ -31,29 +30,26 @@ export default class HardcoverProvider extends BaseProvider {
     title: string,
     author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
     const limit = Math.min((params.limit as number) || 10, 25)
-    const skipCache = options?.skipCache === true
     const languageFilter = params.language as string | undefined
 
-    const bookIds = await this.fetchBookIds(title, author, limit, skipCache)
+    const bookIds = await this.fetchBookIds(title, author, limit)
     if (bookIds.length === 0) {
       return []
     }
 
-    const books = await this.fetchBookDetails(bookIds, skipCache)
+    const books = await this.fetchBookDetails(bookIds)
     return this.processResults(books, bookIds, languageFilter)
   }
 
   private async fetchBookIds(
     title: string,
     author: string | null,
-    limit: number,
-    skipCache: boolean
+    limit: number
   ): Promise<number[]> {
     const searchQuery = author ? `${title} ${author}` : title
-    const cacheKey = `hardcover:${searchQuery}:${limit}`
 
     const searchResponse = await axios.post<{ data?: HardcoverSearchResponse }>(
       HARDCOVER_API_URL,
@@ -78,9 +74,7 @@ export default class HardcoverProvider extends BaseProvider {
     return bookIds
   }
 
-  private async fetchBookDetails(bookIds: number[], skipCache: boolean): Promise<HardcoverBook[]> {
-    const detailsCacheKey = `details:${bookIds.join(',')}`
-
+  private async fetchBookDetails(bookIds: number[]): Promise<HardcoverBook[]> {
     const detailsResponse = await axios.post<{ data?: HardcoverBooksResponse }>(
       HARDCOVER_API_URL,
       {

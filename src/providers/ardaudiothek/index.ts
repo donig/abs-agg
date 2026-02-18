@@ -1,7 +1,6 @@
 import { BaseProvider } from '../BaseProvider'
 import { BookMetadata, ParsedParameters, ProviderConfig } from '../../types'
 import { normalizeBookMetadata } from '../../utils/helpers'
-import { dbManager } from '../../database/manager'
 import { httpClient } from '../../utils/httpClient'
 import path from 'path'
 import fs from 'fs'
@@ -26,26 +25,23 @@ export default class ArdAudiothekProvider extends BaseProvider {
 
   async search(
     title: string,
-    author: string | null,
+    _author: string | null,
     params: ParsedParameters,
-    options?: { skipCache?: boolean }
+    _options?: { skipCache?: boolean }
   ): Promise<BookMetadata[]> {
     const limit = Math.min((params.limit as number) || 5, 20)
-    const skipCache = options?.skipCache === true
     const searchType = (params.searchType as ArdSearchType) || 'search'
 
     if (searchType === 'programsets') {
-      return this.searchProgramSets(title, author, limit, skipCache)
+      return this.searchProgramSets(title, limit)
     }
 
-    return this.searchGeneral(title, author, limit, skipCache)
+    return this.searchGeneral(title, limit)
   }
 
   private async searchGeneral(
     title: string,
-    author: string | null,
-    limit: number,
-    skipCache: boolean
+    limit: number
   ): Promise<BookMetadata[]> {
     const searchUrl = `${ARD_API_BASE}/search?query=${encodeURIComponent(title)}&offset=0&limit=${limit}`
 
@@ -133,9 +129,7 @@ export default class ArdAudiothekProvider extends BaseProvider {
       }
     }
 
-    const series = item.programSet?.title
-      ? [{ series: item.programSet.title, sequence: undefined }]
-      : undefined
+    const series = item.programSet?.title ? [{ series: item.programSet.title, sequence: undefined }] : undefined
 
     return normalizeBookMetadata({
       title: cleanTitle,
@@ -153,9 +147,7 @@ export default class ArdAudiothekProvider extends BaseProvider {
 
   private async searchProgramSets(
     title: string,
-    author: string | null,
-    limit: number,
-    skipCache: boolean
+    limit: number
   ): Promise<BookMetadata[]> {
     const searchUrl = `${ARD_API_BASE}/search/programsets?query=${encodeURIComponent(title)}`
 
