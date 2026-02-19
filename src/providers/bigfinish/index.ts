@@ -308,7 +308,7 @@ export default class BigFinishProvider extends BaseProvider {
         ]
       : undefined
 
-    const duration = data.duration ? parseInt(data.duration, 10) * 60 : undefined
+    const duration = data.duration ? parseInt(data.duration, 10) : undefined
 
     return normalizeBookMetadata({
       title: data.title,
