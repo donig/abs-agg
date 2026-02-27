@@ -20,6 +20,7 @@ export interface BookMetadata {
   series?: SeriesMetadata[]
   language?: string
   duration?: number
+  poweredBy?: string
 }
 
 export interface SearchResult {

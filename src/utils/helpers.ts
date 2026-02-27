@@ -45,7 +45,8 @@ export function normalizeBookMetadata(data: Record<string, unknown>): BookMetada
     tags,
     series,
     language,
-    duration
+    duration,
+    poweredBy
   } = data
 
   return {
@@ -63,7 +64,8 @@ export function normalizeBookMetadata(data: Record<string, unknown>): BookMetada
     tags: Array.isArray(tags) && tags.every((t) => typeof t === 'string') ? tags : undefined,
     series: validateSeriesArray(series),
     language: toStringOrUndefined(language),
-    duration: !isNaN(Number(duration)) && duration !== null ? Number(duration) : undefined
+    duration: !isNaN(Number(duration)) && duration !== null ? Number(duration) : undefined,
+    poweredBy: toStringOrUndefined(poweredBy)
   }
 }
 
