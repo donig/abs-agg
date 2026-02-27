@@ -15,7 +15,7 @@ Use the `example` provider as a reference template.
   "name": "My Provider",
   "available": true,
   "description": "Description of what this provider does",
-  "url": "https://provider-website.com",
+  "url": "https://example.com",
   "parameters": [
     {
       "name": "limit",
