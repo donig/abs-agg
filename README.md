@@ -17,11 +17,14 @@ abs-agg named after "aggregate" and the German "AGG", because each provider shou
 - Hardcover
 - LibriVox
 - Storytel
+- Die drei ???
+- Soundbooth
 
 For detailed documentation on each provider, see [Providers.md](Providers.md).
 
 This unifies many existing audiobook metadata providers into a single server:
-
+<details><summary>Other provider attribution</summary>
+  
 - https://github.com/ahobsonsayers/abs-tract
 - https://github.com/lakafior/audioteka-abs
 - https://github.com/vito0912/abs-bigfinish
@@ -29,6 +32,8 @@ This unifies many existing audiobook metadata providers into a single server:
 - https://github.com/Vito0912/hardcover-provider
 - https://github.com/h43lb1t0/ARD_Audiothek_provider
 - https://github.com/binyaminyblatt/graphicaudio_scraper
+
+</details>
 
 ## Quick Start
 
