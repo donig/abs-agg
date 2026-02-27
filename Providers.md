@@ -1,6 +1,6 @@
 # Metadata Providers
 
-Total Providers: 10
+Total Providers: 11
 
 ## Table of Contents
 
@@ -8,6 +8,7 @@ Total Providers: 10
 - [Audioteka](#audioteka)
 - [Big Finish](#bigfinish)
 - [BookBeat](#bookbeat)
+- [Die drei ???](#dreifragezeichen)
 - [Goodreads](#goodreads)
 - [Graphic Audio](#graphicaudio)
 - [Hardcover](#hardcover)
@@ -228,6 +229,58 @@ Under "Auth" use `abs`
 
 - Data might be unrelated a bit.
 - There are made up to 4 requests per search, so consider ratelimiting if self-hosted! Please check you local laws regarding web scraping and API usage.
+
+---
+
+## Die drei ???
+
+**ID:** `dreifragezeichen`
+
+**Description:** Fetches metadata for the audiobook series 'Die drei ???'. Metadata is weekly from dreimetadaten.de.
+
+**Metadata-URL:** [https://dreifragezeichen.de/](https://dreifragezeichen.de/)
+
+### Parameters
+
+#### Optional Parameters
+
+| Name | Type | Validation | Description |
+|------|------|------------|-------------|
+| `limit` | int | 1-5 | Maximum number of results to return (default: 5, max: 5) |
+
+### Returned Fields
+
+- `title`
+- `author`
+- `narrator`
+- `description`
+- `cover`
+- `publishedYear`
+- `series`
+- `duration`
+- `language`
+- `tags`
+
+### Example Request
+
+```
+GET /dreifragezeichen/search?title=example&author=author
+```
+
+### Add to Audiobookshelf
+
+```
+https://provider.vito0912.de/dreifragezeichen
+```
+
+Under "Auth" use `abs`
+
+> The URL can be replaced by your own deployment. The hosted provider can break at any moment.
+
+### Comments
+
+- Data provided by https://dreimetadaten.de
+- Does include the main series, some specials and kids series
 
 ---
 
