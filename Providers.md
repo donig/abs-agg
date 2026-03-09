@@ -197,7 +197,7 @@ Under "Auth" use `abs`
 | Name | Type | Validation | Description |
 |------|------|------------|-------------|
 | `includeErotic` | enum | [true, false] | Whether to include erotic books (default: false) |
-| `includeHighResCovers` | enum | [true, false] | Whether to include high resolution covers. This highly increases cover loading time (default: false). |
+| `includeHighResCovers` | enum | [true, false] | Whether to include high resolution covers. This highly increases cover loading time (default: false) |
 
 ### Returned Fields
 
