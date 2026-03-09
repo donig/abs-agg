@@ -53,6 +53,15 @@
         "values": ["true", "false"]
       },
       "description": "Whether to include erotic books (default: false)"
+    },
+    {
+      "name": "includeHighResCovers",
+      "required": false,
+      "validation": {
+        "type": "enum",
+        "values": ["true", "false"]
+      },
+      "description": "Whether to include high resolution covers. This highly increases cover loading time (default: false)."
     }
   ],
   "returnedFields": ["title", "author", "description", "cover", "isbn", "series", "language", "publishedYear"],
