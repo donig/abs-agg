@@ -51,6 +51,7 @@ export default class BookBeatProvider extends BaseProvider {
   ): Promise<BookMetadata[]> {
     const market = params.market as string
     const includeErotic = params.includeErotic === 'true' ? 'true' : 'false'
+    const includeHighResCovers = params.includeHighResCovers === 'true' ? 'true' : 'false'
     const suggestUrl = `https://search-api.bookbeat.com/api/appsearch/suggest?includeErotic=${includeErotic}&market=${encodeURIComponent(market)}&query=${encodeURIComponent(title)}&v=18`
     const skipCache = options?.skipCache === true
 
@@ -80,6 +81,9 @@ export default class BookBeatProvider extends BaseProvider {
         dbManager.setBookCache(this.config.id, bookUrl, JSON.stringify(bookJson))
       }
       if (bookData) {
+        if (bookData.image && includeHighResCovers === 'true') {
+          bookData.image = bookData.image.split('?')[0]
+        }
         books.push(this.mapBookBeatToMetadata(bookData))
       }
     }
